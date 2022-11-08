@@ -19,14 +19,22 @@ async function run() {
     try {
         const pizzaCollection = client.db('pepperoni').collection('products');
 
-        app.get('/products', async (req, res) => {
+        app.get('/home-products', async (req, res) => {
+            const query = {};
+            const cursor = pizzaCollection.find(query);
+            const allPizza = await cursor.limit(3).toArray();
+            res.send(allPizza);
+            console.log(allPizza);
+        });
+
+        app.get('/services', async (req, res) => {
             const query = {};
             const cursor = pizzaCollection.find(query);
             const allPizza = await cursor.toArray();
             res.send(allPizza);
         });
 
-        app.get('/products/:id', async (req, res) => {
+        app.get('/services/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectID(id) };
             const pizza = await pizzaCollection.findOne(query);
