@@ -17,6 +17,7 @@ async function run() {
 
     try {
         const pizzaCollection = client.db('pepperoni').collection('products');
+        const reviewCollection = client.db('pepperoni').collection('review');
 
         app.get('/home-products', async (req, res) => {
             const query = {};
@@ -38,6 +39,13 @@ async function run() {
             const pizza = await pizzaCollection.findOne(query);
             res.send(pizza);
         });
+
+        //Add reviews in DB
+        app.post('/add-review', async (req, res) => {
+            const review = req.body;
+            const result = await reviewCollection.insertOne(review);
+            res.send(result);
+        })
 
     }
 
