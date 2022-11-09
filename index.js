@@ -11,7 +11,6 @@ app.use(express.json());
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const { ObjectID } = require('bson');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.hlzaati.mongodb.net/?retryWrites=true&w=majority`;
-console.log(uri);
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
 async function run() {
@@ -24,7 +23,6 @@ async function run() {
             const cursor = pizzaCollection.find(query);
             const allPizza = await cursor.limit(3).toArray();
             res.send(allPizza);
-            console.log(allPizza);
         });
 
         app.get('/services', async (req, res) => {
