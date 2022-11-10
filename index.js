@@ -8,8 +8,7 @@ app.use(cors());
 app.use(express.json());
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
-const { ObjectID } = require('bson');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.hlzaati.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
@@ -42,7 +41,7 @@ async function run() {
 
         app.get('/services/:id', async (req, res) => {
             const id = req.params.id;
-            const query = { _id: ObjectID(id) };
+            const query = { _id: ObjectId(id) };
             const pizza = await pizzaCollection.findOne(query);
             res.send(pizza);
         });
@@ -57,9 +56,56 @@ async function run() {
         // all reviews GET
         app.get('/reviews', async (req, res) => {
             const query = {};
-            const cursor = reviewCollection.find(query);
+            const cursor = reviewCollection.find(query).sort({ _id: -1 });
             const reviews = await cursor.toArray();
             res.send(reviews);
+        })
+
+        app.get('/my-reviews', async (req, res) => {
+            const email = req.query.email;
+            let query = {}
+            if (req.query.email) {
+                query = { email: req.query.email }
+            }
+            const cursor = reviewCollection.find(query);
+            const result = await cursor.toArray();
+            res.send(result);
+        });
+
+        // delete user review 
+        app.delete('/my-reviews/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await reviewCollection.deleteOne(query);
+            res.send(result);
+        });
+
+        // get specific review
+        app.get('/update/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = {
+                _id: ObjectId(id)
+            }
+            const result = await reviewCollection.findOne(query)
+            res.send(result)
+        })
+
+        // update review
+        app.patch('/update/:id', async (req, res) => {
+            const id = req.params.id;
+            const updateInfo = req.body;
+            console.log(updateInfo)
+            const query = {
+                _id: ObjectId(id)
+            };
+            const updatedDoc = {
+                $set: {
+                    review: updateInfo.message,
+                    rating: updateInfo.rating
+                }
+            }
+            const result = await reviewCollection.updateOne(query, updatedDoc);
+            res.send(result);
         })
 
     }
