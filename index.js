@@ -33,6 +33,13 @@ async function run() {
             res.send(allPizza);
         });
 
+        //add service
+        app.post('/add-services', async (req, res) => {
+            const service = req.body;
+            const result = await pizzaCollection.insertOne(service);
+            res.send(result);
+        });
+
         app.get('/services/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectID(id) };
